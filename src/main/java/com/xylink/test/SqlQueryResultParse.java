@@ -11,6 +11,7 @@ import com.xylink.excel.vo.OrganVo;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -21,7 +22,7 @@ import java.util.Map;
 
 /**
  * @author 刘启航
- * @date 2023/3/29 15:31
+ * @date 2023/5/8 09:14
  * @desc
  */
 public class SqlQueryResultParse {
@@ -41,41 +42,57 @@ public class SqlQueryResultParse {
      */
     private static String SHEET_NAME = "所属事业群数据";
 
-    public static void main(String[] args) throws IOException {
-        String text = Files.asCharSource(new File(INPUT_FILE_PATH), Charsets.UTF_8).read();
+    public static void main(String[] args) {
+        //待变更 坐标，只需替换Class即可, 替换对象的属性值需要和解析文件内一致（这里偷个懒,就不按照规范命名了）
+        parseAndWriteData(OrganVo.class);
+    }
+
+    private static void parseAndWriteData(Class clazz){
+        if(clazz== null){
+            return ;
+        }
+
+        String text = null;
+        try {
+            text = Files.asCharSource(new File(INPUT_FILE_PATH), Charsets.UTF_8).read();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         List<List> lists = JSON.parseArray(text, List.class);
         System.out.println("数据总长度：" + lists.size());
 
         List<Object> dataList = new ArrayList<>();
-        Map<Integer, String> objFieldMap = parseObjField(OrganVo.class);
+        Map<Integer, String> objFieldMap = parseObjField(clazz);
 
         for (List<JSONObject> childList:
                 lists) {
-            //需要修改的地方
-            OrganVo organVo = new OrganVo();
+            try {
+                Constructor declaredConstructor = OrganVo.class.getDeclaredConstructor();
+                declaredConstructor.setAccessible(true);
+                Object obj = declaredConstructor.newInstance();
 
-            for (int i = 0; i < childList.size(); i++) {
-                String tempVal = childList.get(i).get(objFieldMap.get(i)) == null ? "" : childList.get(i).get(objFieldMap.get(i)).toString();
-                try {
+                for (int i = 0; i < childList.size(); i++) {
+                    String tempVal = childList.get(i).get(objFieldMap.get(i)) == null ? "" : childList.get(i).get(objFieldMap.get(i)).toString();
                     String methodName = "set" + objFieldMap.get(i);
                     Method method = OrganVo.class.getDeclaredMethod(methodName, String.class);
-                    method.invoke(organVo, tempVal);
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                    method.invoke(obj, tempVal);
                 }
+                dataList.add(obj);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            dataList.add(organVo);
         }
 
         EasyExcel.write(new File(OUTPUT_FILE_PATH), OrganVo.class).sheet(StrUtil.isEmpty(SHEET_NAME)? "Sheet-1" : SHEET_NAME).doWrite(dataList);
         System.out.println("解析完成...");
     }
 
-
+    /**
+     * 解析指定类 属性上ExcelProperty注解的index值和属性名称  转换为键值对
+     * @param clazz
+     * @param <T>
+     * @return
+     */
     private static <T> Map<Integer, String> parseObjField(Class clazz){
         System.out.println(clazz.getCanonicalName());
         Map<Integer, String> resultMap = new HashMap<>(16);
