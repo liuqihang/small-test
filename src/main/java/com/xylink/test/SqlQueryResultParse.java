@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,7 +42,7 @@ public class SqlQueryResultParse {
     private static String SHEET_NAME = "所属事业群数据";
 
     public static void main(String[] args) {
-        //待变更 坐标，只需替换Class即可, 替换对象的属性值需要和解析文件内一致（这里偷个懒,就不按照规范命名了）
+        //待变 坐标，只需替换Class即可, 替换对象的属性值需要和解析文件内一致（这里偷个懒,就不按照规范命名了）
         parseAndWriteData(OrganVo.class);
     }
 
@@ -67,14 +66,14 @@ public class SqlQueryResultParse {
         for (List<JSONObject> childList:
                 lists) {
             try {
-                Constructor declaredConstructor = OrganVo.class.getDeclaredConstructor();
+                Constructor declaredConstructor = clazz.getDeclaredConstructor();
                 declaredConstructor.setAccessible(true);
                 Object obj = declaredConstructor.newInstance();
 
                 for (int i = 0; i < childList.size(); i++) {
                     String tempVal = childList.get(i).get(objFieldMap.get(i)) == null ? "" : childList.get(i).get(objFieldMap.get(i)).toString();
                     String methodName = "set" + objFieldMap.get(i);
-                    Method method = OrganVo.class.getDeclaredMethod(methodName, String.class);
+                    Method method = clazz.getDeclaredMethod(methodName, String.class);
                     method.invoke(obj, tempVal);
                 }
                 dataList.add(obj);
@@ -83,7 +82,7 @@ public class SqlQueryResultParse {
             }
         }
 
-        EasyExcel.write(new File(OUTPUT_FILE_PATH), OrganVo.class).sheet(StrUtil.isEmpty(SHEET_NAME)? "Sheet-1" : SHEET_NAME).doWrite(dataList);
+        EasyExcel.write(new File(OUTPUT_FILE_PATH), clazz).sheet(StrUtil.isEmpty(SHEET_NAME)? "Sheet-1" : SHEET_NAME).doWrite(dataList);
         System.out.println("解析完成...");
     }
 
