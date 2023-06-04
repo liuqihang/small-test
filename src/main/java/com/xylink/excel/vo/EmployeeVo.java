@@ -12,17 +12,17 @@ import lombok.Data;
 public class EmployeeVo {
 
     @ExcelProperty(value = "姓名", index = 0)
-    private String userName;
+    private String USER_NAME;
 
     @ExcelProperty(value = "手机号", index = 1)
-    private String telephone;
+    private String TELEPHONE;
 
     @ExcelProperty(value = "职务", index = 2)
-    private String postNm;
+    private String POST_NM;
 
     @ExcelProperty(value = "机构名称", index = 3)
-    private String organName;
+    private String ORGAN_NAME;
 
     @ExcelProperty(value = "所属机构全路径", index = 4)
-    private String path;
+    private String PATH;
 }

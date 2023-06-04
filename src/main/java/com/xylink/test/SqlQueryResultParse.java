@@ -7,7 +7,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
-import com.xylink.excel.vo.OrganVo;
+import com.xylink.excel.vo.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,21 +29,23 @@ public class SqlQueryResultParse {
     /**
      * 文件输入路径
      */
-    private static String INPUT_FILE_PATH = "C:\\Users\\Vicky\\Downloads\\prj_info_org.txt";
+//    private static String INPUT_FILE_PATH = "C:\\Users\\Vicky\\Downloads\\prj_info_org.txt";
+    private static String INPUT_FILE_PATH = "C:\\Users\\Vicky\\Documents\\运维中心导出\\待解析文件\\txl_20230601.txt";
 
     /**
      * 文件输出路径
      */
-    private static String OUTPUT_FILE_PATH = "C:\\Users\\Vicky\\Documents\\运维中心导出\\所属事业群数据.xlsx";
+    private static String OUTPUT_FILE_PATH = "C:\\Users\\Vicky\\Documents\\运维中心导出\\txl_20230601.xlsx";
 
     /**
      * Sheet名称
      */
-    private static String SHEET_NAME = "所属事业群数据";
+    private static String SHEET_NAME = "通讯录数据";
 
     public static void main(String[] args) {
         //待变 坐标，只需替换Class即可, 替换对象的属性值需要和解析文件内一致（这里偷个懒,就不按照规范命名了）
-        parseAndWriteData(OrganVo.class);
+//        parseAndWriteData(TxlData.class);
+        parseJsonDataAndWriteData(TxlData.class);
     }
 
     private static void parseAndWriteData(Class clazz){
@@ -84,6 +86,20 @@ public class SqlQueryResultParse {
 
         EasyExcel.write(new File(OUTPUT_FILE_PATH), clazz).sheet(StrUtil.isEmpty(SHEET_NAME)? "Sheet-1" : SHEET_NAME).doWrite(dataList);
         System.out.println("解析完成...");
+    }
+
+    private static void parseJsonDataAndWriteData(Class clazz){
+        String text = null;
+        try {
+            text = Files.asCharSource(new File(INPUT_FILE_PATH), Charsets.UTF_8).read();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        List<Object> txlDataList = JSON.parseArray(text, clazz);
+        System.out.println("JSON --- 数据总长度：" + txlDataList.size());
+
+        EasyExcel.write(new File(OUTPUT_FILE_PATH), clazz).sheet(StrUtil.isEmpty(SHEET_NAME)? "Sheet-1" : SHEET_NAME).doWrite(txlDataList);
+        System.out.println("JSON --- 解析完成...");
     }
 
     /**

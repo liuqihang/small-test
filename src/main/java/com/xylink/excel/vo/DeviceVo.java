@@ -11,21 +11,27 @@ import lombok.Data;
 @Data
 public class DeviceVo {
 
-    @ExcelProperty(value = "设备NO", index = 0)
-   private String deviceNo;
+    @ExcelProperty(value = "员工编号", index = 0)
+   private String EMPLOYEE_NO;
 
-    @ExcelProperty(value = "客户端版本", index = 1)
-    private String appVersion;
+    @ExcelProperty(value = "姓名", index = 1)
+    private String USERNAME;
 
-    @ExcelProperty(value = "设备名称", index = 2)
-    private String deviceName;
+    @ExcelProperty(value = "手机号", index = 2)
+    private String TELEPHONE;
 
     @ExcelProperty(value = "accountNo账户", index = 3)
-    private String employeeNo;
+    private String ACCOUNT_NO;
 
-    @ExcelProperty(value = "用户名", index = 4)
-    private String userName;
+    @ExcelProperty(value = "部门", index = 4)
+    private String DEPT;
 
-    @ExcelProperty(value = "手机号", index = 5)
-    private String telephone;
+    @ExcelProperty(value = "系统类别", index = 5)
+    private String SYSTEM;
+
+    @ExcelProperty(value = "最后一次登录时间", index = 6)
+    private String LAST_LOGIN_TIME;
+
+    @ExcelProperty(value = "职位", index = 7)
+    private String POST_NM;
 }
