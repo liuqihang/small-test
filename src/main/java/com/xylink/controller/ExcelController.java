@@ -1,9 +1,14 @@
 package com.xylink.controller;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.CharsetUtil;
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.excel.util.FileUtils;
+import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.xylink.excel.EasyExcelUtil;
+import com.xylink.excel.SpinnerWriteHandler;
 import com.xylink.excel.vo.ExportVo;
 import com.xylink.excel.vo.HonorVo;
 import com.xylink.excel.vo.Title;
@@ -18,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,6 +39,21 @@ public class ExcelController {
 
     /** 注入ApplicationContext用来发布事件 */
     private final ApplicationContext applicationContext;
+
+    @GetMapping("exportExcel2")
+    public void exportExcel2(HttpServletResponse response) throws IOException {
+//        response.setContentType("application/vnd.ms-excel");
+//        response.setCharacterEncoding(CharsetUtil.UTF_8);
+//        response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + "lqh" + ExcelTypeEnum.XLSX.getValue());
+//        EasyExcel.write(
+//                response.getOutputStream(),
+//                HonorVo.class
+//        ).sheet("测试1")
+//                .registerWriteHandler(new SpinnerWriteHandler())
+//                .doWrite(Lists.newArrayList());
+
+        EasyExcelUtil.writeExcelBySelect(response, "测试", "", new ArrayList<HonorVo>(), HonorVo.class);
+    }
 
     @PostMapping("exportExcel")
     public void exportExcel(HttpServletResponse response) throws IOException {

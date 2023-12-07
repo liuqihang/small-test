@@ -1,6 +1,8 @@
 package com.xylink.excel.vo;
 
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.xylink.excel.CityExcelSelectedImpl;
+import com.xylink.excel.ExcelSelected;
 import lombok.Data;
 
 /**
@@ -22,9 +24,11 @@ public class HonorVo {
     private String name;
 
     @ExcelProperty(value = "项目名称", index = 3)
+    @ExcelSelected(source = {"男","女"})
     private String projectName;
 
     @ExcelProperty(value = "奖项名称", index = 4)
+    @ExcelSelected(sourceClass = CityExcelSelectedImpl.class)
     private String honorName;
 
     @ExcelProperty(value = "参评类别", index = 5)
